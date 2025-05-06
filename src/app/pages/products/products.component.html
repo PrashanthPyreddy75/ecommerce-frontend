@@ -1,0 +1,41 @@
+<div class="products-container">
+  <div class="products-header">
+    <div class="filter-bar">
+      <div class="search-wrapper">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Search for products..."
+          class="search-input"
+        />
+      </div>
+      <div class="category-wrapper">
+        <select [(ngModel)]="selectedCategory" class="category-select">
+          <option value="">All Categories</option>
+          <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="product-grid">
+    <div class="product-card" *ngFor="let product of filterProducts()">
+      <img [src]="product.imageUrl" alt="{{ product.name }}" class="product-image" />
+      <h3>{{ product.name }}</h3>
+      <p>₹{{ product.price }}</p>
+      <div class="quantity-controls">
+        <ng-container *ngIf="product.quantity === 0; else quantitySet">
+          <button class="add-btn" (click)="updateQuantity(product, 1)">ADD</button>
+        </ng-container>
+
+        <ng-template #quantitySet>
+          <div class="qty-pill" (click)="$event.stopPropagation()">
+            <span (click)="updateQuantity(product, -1)">−</span>
+            <span>{{ product.quantity }}</span>
+            <span (click)="updateQuantity(product, 1)">+</span>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

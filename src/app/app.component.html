@@ -1,0 +1,26 @@
+<nav class="navbar">
+  <div class="logo" (click)="goHome()" style="cursor: pointer;">
+    🛒 Demokart
+  </div>
+
+  <div *ngIf="showNav" class="nav-actions">
+    <div
+      class="cart-nav"
+      [class.disabled]="cartCount === 0"
+      [class.active]="cartCount > 0"
+      (click)="cartCount > 0 ? goToOrder() : null"
+    >
+      <img
+        src="https://img.icons8.com/ios-filled/50/FFFFFF/shopping-cart.png"
+        width="18"
+        style="filter: brightness(0) invert(1);"
+      />
+      <span *ngIf="cartCount > 0">{{ cartCount }} items</span>
+      <span *ngIf="cartCount === 0">My Cart</span>
+    </div>
+
+    <button class="logout-btn" (click)="logout()">Logout</button>
+  </div>
+</nav>
+
+<router-outlet></router-outlet>

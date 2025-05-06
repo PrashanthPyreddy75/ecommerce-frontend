@@ -1,0 +1,47 @@
+[
+  {
+    "id": "1",
+    "name": "iPhone 15 Pro",
+    "price": 1200,
+    "stock": 10,
+    "category": "Mobiles",
+    "Description": "",
+    "imageUrl": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-model-unselect-gallery-1-202309?wid=5120&hei=2880&fmt=jpeg&qlt=80&.v=1692923775113"
+  },
+  {
+    "id": "2",
+    "name": "Samsung Galaxy S23",
+    "price": 1000,
+    "stock": 8,
+    "category": "Mobiles",
+    "Description": "",
+    "imageUrl": "https://images.samsung.com/is/image/samsung/assets/az/smartphones/galaxy-s23/galaxy-s23-highlights-kv.jpg?$ORIGIN_JPG$"
+  },
+  {
+    "id": "3",
+    "name": "MacBook Air",
+    "price": 1500,
+    "stock": 5,
+    "category": "Laptops",
+    "Description": "",
+    "imageUrl": "https://www.digitaltrends.com/wp-content/uploads/2022/08/macbook-air-m2-1.jpg?fit=1562%2C1000&p=1"
+  },
+  {
+    "id": "4",
+    "name": "Dell XPS 13",
+    "price": 1400,
+    "stock": 6,
+    "category": "Laptops",
+    "Description": "",
+    "imageUrl": "https://sm.pcmag.com/t/pcmag_uk/review/d/dell-xps-1/dell-xps-13-plus-2023_eqbe.1920.jpg"
+  },
+  {
+    "id": "5",
+    "name": "Sony WH-1000XM5",
+    "price": 400,
+    "stock": 15,
+    "category": "Accessories",
+    "Description": "",
+    "imageUrl": "https://www.soundphilereview.com/wp-content/uploads/2022/11/Sony-WH1000XM5-review-6-1024x658.jpg"
+  }
+]

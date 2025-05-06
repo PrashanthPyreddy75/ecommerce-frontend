@@ -1,0 +1,30 @@
+<div class="product-detail-wrapper" *ngIf="product">
+  <div class="product-container">
+    <div class="product-left">
+      <img [src]="product.imageUrl" alt="{{ product.name }}" class="product-image" />
+      <div class="product-specs">
+        <h3>Product Details</h3>
+        <p>{{ product.description }}</p>
+      </div>
+    </div>
+
+    <div class="product-right">
+      <h2 class="product-name">{{ product.name }}</h2>
+      <p class="product-price">₹{{ product.price }}</p>
+
+      <div class="quantity-control">
+        <div *ngIf="quantity > 0; else addButton" class="quantity-frame">
+          <button (click)="decreaseQuantity()">-</button>
+          <span>{{ quantity }}</span>
+          <button (click)="increaseQuantity()">+</button>
+        </div>
+
+        <ng-template #addButton>
+          <button class="add-frame" (click)="increaseQuantity()">ADD</button>
+        </ng-template>
+      </div>
+
+      <button class="order-now" (click)="orderNow()">Order Now</button>
+    </div>
+  </div>
+</div>

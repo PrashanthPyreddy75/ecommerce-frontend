@@ -1,0 +1,65 @@
+<div class="payment-wrapper" *ngIf="cartItems.length > 0">
+  <div *ngIf="showMessage" class="popup-message">{{ showMessage }}</div>
+
+  <h2>Complete Your Payment</h2>
+
+  <div class="cart-summary">
+    <div *ngFor="let item of cartItems" class="cart-item">
+      <img [src]="item.imageUrl" alt="{{ item.name }}" />
+      <div class="details">
+        <strong>{{ item.name }}</strong>
+        <p>Quantity: {{ item.quantity }}</p>
+        <p>Subtotal: ₹{{ item.subtotal }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="total">
+    <h3>Total: ₹{{ totalAmount }}</h3>
+  </div>
+
+  <div class="payment-form">
+    <div class="input-group" [class.error]="cardNumberError">
+      <input
+        type="text"
+        placeholder="Card Number"
+        [(ngModel)]="cardNumber"
+        (input)="formatCardNumber($event)"
+        (blur)="validateCardNumber()"
+        maxlength="19"
+      />
+      <div class="error-msg" *ngIf="cardNumberError">{{ cardNumberError }}</div>
+    </div>
+
+    <div class="input-group" [class.error]="expiryError">
+      <input
+        type="text"
+        placeholder="Expiry (MM/YY)"
+        [(ngModel)]="expiry"
+        (input)="formatExpiry($event)"
+        (blur)="validateExpiry()"
+        maxlength="5"
+      />
+      <div class="error-msg" *ngIf="expiryError">{{ expiryError }}</div>
+    </div>
+
+    <div class="input-group" [class.error]="cvvError">
+      <input
+        type="text"
+        placeholder="CVV"
+        [(ngModel)]="cvv"
+        (keypress)="onlyNumberInput($event)"
+        (blur)="validateCVV()"
+        maxlength="3"
+      />
+      <div class="error-msg" *ngIf="cvvError">{{ cvvError }}</div>
+    </div>
+  </div>
+
+  <div class="payment-buttons">
+    <button (click)="payNow()" [disabled]="!formValid">Pay</button>
+    <button (click)="cancelPayment()">Cancel</button>
+  </div>
+
+  <div class="timer">⏳ Time Left: {{ timeLeft }} seconds</div>
+</div>

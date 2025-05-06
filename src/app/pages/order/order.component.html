@@ -1,0 +1,24 @@
+<div class="order-container" *ngIf="cartItems.length > 0">
+  <h2>Your Order</h2>
+
+  <div *ngFor="let item of cartItems" class="order-card">
+    <img [src]="item.imageUrl" alt="{{ item.name }}" class="order-image" />
+
+    <div class="order-info">
+      <h3>{{ item.name }}</h3>
+      <p>Quantity: <strong>{{ item.quantity }}</strong></p>
+      <p>Subtotal: <strong>₹{{ item.subtotal }}</strong></p>
+    </div>
+  </div>
+
+  <div class="order-summary">
+    <h3>Total: ₹{{ totalAmount }}</h3>
+
+    <div class="order-buttons">
+      <button class="back-btn" (click)="goBack()">Back</button>
+      <button class="pay-btn" (click)="proceedToPayment()">
+        {{ retryPayment ? 'Retry Payment' : 'Proceed to Payment' }}
+      </button>
+    </div>
+  </div>
+</div>
