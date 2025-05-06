@@ -25,8 +25,8 @@ export class OrderComponent implements OnInit, OnDestroy {
   ) {}
 
 ngOnInit(): void {
-  const retry = window.history.state?.retry || false;
-  this.retryPayment = retry;
+
+  this.retryPayment = localStorage.getItem('retryPayment') === 'true';
 
   // ⛔️ HACK: force reload
   if (Object.keys(this.cartService.getCart()).length === 0) {
