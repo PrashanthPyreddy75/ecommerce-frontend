@@ -17,6 +17,7 @@ export class ProductsComponent implements OnInit {
   categories: string[] = [];
   selectedCategory = '';
   searchTerm = '';
+  limitMessage: { [productId: string]: boolean } = {};
 
   constructor(
     private router: Router,
@@ -52,7 +53,19 @@ export class ProductsComponent implements OnInit {
 
   updateQuantity(product: any, change: number) {
     const newQty = product.quantity + change;
+      if (change > 0 && newQty > product.stock) {
+        // Show stock limit warning
+        this.showLimitMessage(product.id);
+        return;
+      }
     const finalQty = Math.max(0, newQty);
+    product.quantity = finalQty;
     this.cartService.updateQuantity(product.id, finalQty);
+  }
+  showLimitMessage(productId: string) {
+    this.limitMessage[productId] = true;
+    setTimeout(() => {
+      this.limitMessage[productId] = false;
+    }, 2000);
   }
 }
