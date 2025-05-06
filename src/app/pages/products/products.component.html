@@ -24,17 +24,29 @@
       <h3>{{ product.name }}</h3>
       <p>₹{{ product.price }}</p>
       <div class="quantity-controls">
-        <ng-container *ngIf="product.quantity === 0; else quantitySet">
-          <button class="add-btn" (click)="updateQuantity(product, 1)">ADD</button>
+        <!-- Out of stock -->
+        <ng-container *ngIf="product.stock === 0">
+          <button class="add-btn disabled" disabled>Out of Stock</button>
         </ng-container>
 
-        <ng-template #quantitySet>
-          <div class="qty-pill" (click)="$event.stopPropagation()">
-            <span (click)="updateQuantity(product, -1)">−</span>
-            <span>{{ product.quantity }}</span>
-            <span (click)="updateQuantity(product, 1)">+</span>
-          </div>
-        </ng-template>
+        <!-- Add button (Blinkit style) -->
+        <ng-container *ngIf="product.stock > 0">
+          <ng-container *ngIf="product.quantity === 0; else quantitySet">
+            <button class="add-btn" (click)="updateQuantity(product, 1)">ADD</button>
+          </ng-container>
+
+          <ng-template #quantitySet>
+            <div class="qty-blinkit-box">
+              <button (click)="updateQuantity(product, -1)">−</button>
+              <span>{{ product.quantity }}</span>
+              <button (click)="updateQuantity(product, 1)">+</button>
+            </div>
+          </ng-template>
+        </ng-container>
+      </div>
+
+      <div *ngIf="limitMessage[product.id]" class="limit-msg">
+        Sorry, you can't add more of this item.
       </div>
     </div>
   </div>
