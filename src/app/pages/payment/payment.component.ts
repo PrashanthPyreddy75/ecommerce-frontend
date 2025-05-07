@@ -62,8 +62,9 @@ this.cartItems = (Object.entries(cart) as [string, number][]).map(([id, quantity
       if (this.timeLeft <= 0) {
         clearInterval(this.timer);
         this.showMessage = '⏳ Time expired! Redirecting to Order Page...';
+        localStorage.setItem('retryPayment', 'true');
         setTimeout(() => {
-          this.router.navigate(['/order'], { state: { retry: true } });
+          this.router.navigate(['/order']);
         }, 5000);
       }
     }, 1000);
@@ -124,7 +125,7 @@ this.cartItems = (Object.entries(cart) as [string, number][]).map(([id, quantity
     this.showMessage = '✅ Payment Successful! Redirecting to Products...';
     localStorage.removeItem('cart');
     localStorage.setItem('resetCart', 'true');
-
+    localStorage.removeItem('retryPayment');
     setTimeout(() => {
       location.href = '/products';
     }, 2000);
@@ -132,7 +133,9 @@ this.cartItems = (Object.entries(cart) as [string, number][]).map(([id, quantity
 
   cancelPayment() {
     clearInterval(this.timer);
-    location.href = '/order';
+    localStorage.setItem('retryPayment', 'true');
+    this.router.navigate(['/order']);
+    //this.router.navigate(['/order'], { state: { retry: true } });
   }
 
   ngOnDestroy(): void {
