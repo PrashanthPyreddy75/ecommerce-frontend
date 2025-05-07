@@ -26,16 +26,32 @@ export class ProductsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const resetCart = localStorage.getItem('resetCart') === 'true';
+      if (resetCart) {
+        localStorage.removeItem('productQuantities');
+        localStorage.removeItem('resetCart'); // clean it up
+      }
     this.productService.getProducts().subscribe((data: any[]) => {
       this.products = data;
       localStorage.setItem('productList', JSON.stringify(data));
       this.categories = [...new Set(this.products.map(p => p.category))];
 
-      this.cartService.getCartMapObservable().subscribe(cartMap => {
+      this.cartService.getCartMapObservable().subscribe((cartMap: Map<string, number>) => {
         this.products.forEach(product => {
-          product.quantity = cartMap.get(product.id) || 0;
+          const qty = cartMap.get(product.id.toString()) || 0;  // ensure string key
+          product.quantity = qty;
         });
       });
+
+      // Initialize quantities from local storage
+      this.initializeQuantities();
+    });
+  }
+
+  initializeQuantities() {
+    const storedQuantities = JSON.parse(localStorage.getItem('productQuantities') || '{}');
+    this.products.forEach(product => {
+      product.quantity = storedQuantities[product.id] || 0;
     });
   }
 
@@ -53,15 +69,27 @@ export class ProductsComponent implements OnInit {
 
   updateQuantity(product: any, change: number) {
     const newQty = product.quantity + change;
-      if (change > 0 && newQty > product.stock) {
-        // Show stock limit warning
-        this.showLimitMessage(product.id);
-        return;
-      }
-    const finalQty = Math.max(0, newQty);
+    if (change > 0 && newQty > product.stock) {
+      // Show stock limit warning
+      this.showLimitMessage(product.id);
+      return;
+    }
+    const finalQty = newQty < 0 ? 0 : newQty;
     product.quantity = finalQty;
     this.cartService.updateQuantity(product.id, finalQty);
+
+    // Persist quantities in local storage
+    this.persistQuantities();
   }
+
+  persistQuantities() {
+    const quantities = this.products.reduce((acc, product) => {
+      acc[product.id] = product.quantity;
+      return acc;
+    }, {});
+    localStorage.setItem('productQuantities', JSON.stringify(quantities));
+  }
+
   showLimitMessage(productId: string) {
     this.limitMessage[productId] = true;
     setTimeout(() => {

@@ -38,6 +38,7 @@ goToOrder() {
 
   logout() {
     localStorage.clear();
+    this.cartService.resetCart();
     this.router.navigate(['/login']);
   }
 
