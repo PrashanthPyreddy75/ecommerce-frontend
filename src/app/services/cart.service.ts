@@ -17,7 +17,7 @@ private cartState$ = new BehaviorSubject<{ [id: string]: number }>({});
     const data = localStorage.getItem(this.cartKey);
     if (data) {
       const obj = JSON.parse(data);
-      Object.keys(obj).forEach(id => this.cart.set(id, obj[id]));
+      Object.keys(obj).forEach(id => this.cart.set(id.toString(), obj[id]));
     }
     this.updateCartCount();
     this.updateCartState();
@@ -36,16 +36,17 @@ private cartState$ = new BehaviorSubject<{ [id: string]: number }>({});
   }
 
   updateQuantity(productId: string, quantity: number) {
+    const id = productId.toString();
     if (quantity <= 0) {
-      this.cart.delete(productId);
+      this.cart.delete(id);
     } else {
-      this.cart.set(productId, quantity);
+      this.cart.set(id, quantity);
     }
     this.saveCart();
   }
 
   getQuantity(productId: string): number {
-    return this.cart.get(productId) || 0;
+    return this.cart.get(productId.toString()) || 0;
   }
 
   getCart(): Map<string, number> {
@@ -79,4 +80,10 @@ private updateCartState() {
     this.cart.forEach(qty => total += qty);
     this.cartCount$.next(total);
   }
+resetCart() {
+  this.cart.clear();
+  this.cartCount$.next(0);
+  this.cartMap$.next(new Map());
+  this.cartState$.next({});
+}
 }
