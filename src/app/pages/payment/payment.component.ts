@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { PaymentService } from '../../services/payment.service';
 
 @Component({
   selector: 'app-payment',
@@ -23,21 +24,21 @@ export class PaymentComponent implements OnInit, OnDestroy {
   cvvError = '';
 
   timer: any;
-  timeLeft = 20;
+  timeLeft = 70;
   showMessage = '';
+  orderId: string = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private paymentService: PaymentService) {}
 
   ngOnInit(): void {
-    const state = window.history.state as { retry?: boolean };
+    const state = window.history.state as { retry?: boolean, orderId?: string };
+    this.orderId = state.orderId || '';
     console.log('🌐 STATE:', state);
 
     const cart = JSON.parse(localStorage.getItem('cart') || '{}');
     const products = JSON.parse(localStorage.getItem('productList') || '[]');
 
     const cartEntries = Object.entries(cart);
-    console.log('cart',cart);
-    console.log('products',products);
     if (!cartEntries.length || !products.length) {
       this.router.navigate(['/products']);
       return;
@@ -64,8 +65,10 @@ this.cartItems = (Object.entries(cart) as [string, number][]).map(([id, quantity
         this.showMessage = '⏳ Time expired! Redirecting to Order Page...';
         localStorage.setItem('retryPayment', 'true');
         setTimeout(() => {
-          this.router.navigate(['/order']);
-        }, 5000);
+
+          this.router.navigate(['/order'], { state: { retry: true, orderId: this.orderId } });
+        }, 3000);
+
       }
     }, 1000);
   }
@@ -120,22 +123,35 @@ this.cartItems = (Object.entries(cart) as [string, number][]).map(([id, quantity
     this.validateExpiry();
     this.validateCVV();
 
-    if (this.cardNumberError || this.expiryError || this.cvvError) return;
+    if (!this.formValid) return;
 
-    this.showMessage = '✅ Payment Successful! Redirecting to Products...';
-    localStorage.removeItem('cart');
-    localStorage.setItem('resetCart', 'true');
-    localStorage.removeItem('retryPayment');
-    setTimeout(() => {
-      location.href = '/products';
-    }, 2000);
+
+    this.paymentService.createPayment(this.orderId).subscribe(
+      () => {
+              this.showMessage = '✅ Payment Successful! Redirecting to Home page...';
+              localStorage.removeItem('cart');
+              localStorage.removeItem('productQuantities');
+              localStorage.setItem('resetCart', 'true');
+
+              setTimeout(() => {
+                this.router.navigate(['/products']);
+              }, 2000);
+            },
+            () => {
+                  this.showMessage = '❌ Payment failed. Try again.';
+            }
+          );
+
+
   }
 
   cancelPayment() {
     clearInterval(this.timer);
-    localStorage.setItem('retryPayment', 'true');
-    this.router.navigate(['/order']);
-    //this.router.navigate(['/order'], { state: { retry: true } });
+
+    this.paymentService.cancelOrder(this.orderId).subscribe(() => {
+      this.router.navigate(['/order'], { state: { retry: true, orderId: this.orderId } });
+    });
+
   }
 
   ngOnDestroy(): void {

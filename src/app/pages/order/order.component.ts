@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
+import { OrderService } from '../../services/order.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -17,16 +18,24 @@ export class OrderComponent implements OnInit, OnDestroy {
   totalAmount: number = 0;
   retryPayment = false;
   private sub = new Subscription();
+  orderId: string = '';
 
   constructor(
     private router: Router,
     private cartService: CartService,
-    private productService: ProductService
+    private productService: ProductService,
+    private orderService: OrderService
   ) {}
 
 ngOnInit(): void {
 
-  this.retryPayment = localStorage.getItem('retryPayment') === 'true';
+  const retry = window.history.state?.retry || false;
+
+  const state = window.history.state || {};
+  this.retryPayment = state.retry || false;
+  this.orderId = state.orderId || '';
+
+
 
   // ⛔️ HACK: force reload
   if (Object.keys(this.cartService.getCart()).length === 0) {
@@ -68,7 +77,39 @@ ngOnInit(): void {
   }
 
   proceedToPayment() {
-    this.router.navigate(['/payment']);
+  const payload = {
+    products: this.cartItems.map(item => ({
+      productId: item.id,
+      quantity: item.quantity,
+      price: item.price
+    })),
+    paymentMethod: 'CREDIT_CARD' // ✅ Added here
+  };
+
+      if (this.retryPayment && this.orderId) {
+        // 🔁 Retry: PUT
+        this.orderService.retryOrder(this.orderId, payload).subscribe(
+          () => {
+            console.log('Order ID before payment page:', this.orderId);
+            this.router.navigate(['/payment'], { state: { orderId: this.orderId } });
+
+          },
+          err => {
+            console.error('Retry Order Failed:', err);
+          }
+        );
+      } else {
+        // 🆕 New: POST
+        this.orderService.placeOrder(payload).subscribe(
+          (response: any) => {
+            const newOrderId = response?.id;
+            this.router.navigate(['/payment'], { state: { orderId: newOrderId } });
+          },
+          err => {
+            console.error('Order Placement Failed:', err);
+          }
+        );
+      }
   }
 
   ngOnDestroy(): void {
