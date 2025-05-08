@@ -63,9 +63,12 @@ this.cartItems = (Object.entries(cart) as [string, number][]).map(([id, quantity
       if (this.timeLeft <= 0) {
         clearInterval(this.timer);
         this.showMessage = '⏳ Time expired! Redirecting to Order Page...';
+        localStorage.setItem('retryPayment', 'true');
         setTimeout(() => {
+
           this.router.navigate(['/order'], { state: { retry: true, orderId: this.orderId } });
         }, 3000);
+
       }
     }, 1000);
   }
@@ -122,6 +125,7 @@ this.cartItems = (Object.entries(cart) as [string, number][]).map(([id, quantity
 
     if (!this.formValid) return;
 
+
     this.paymentService.createPayment(this.orderId).subscribe(
       () => {
               this.showMessage = '✅ Payment Successful! Redirecting to Home page...';
@@ -138,13 +142,16 @@ this.cartItems = (Object.entries(cart) as [string, number][]).map(([id, quantity
             }
           );
 
+
   }
 
   cancelPayment() {
     clearInterval(this.timer);
+
     this.paymentService.cancelOrder(this.orderId).subscribe(() => {
       this.router.navigate(['/order'], { state: { retry: true, orderId: this.orderId } });
     });
+
   }
 
   ngOnDestroy(): void {

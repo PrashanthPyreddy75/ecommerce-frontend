@@ -28,11 +28,13 @@ export class OrderComponent implements OnInit, OnDestroy {
   ) {}
 
 ngOnInit(): void {
+
   const retry = window.history.state?.retry || false;
 
   const state = window.history.state || {};
   this.retryPayment = state.retry || false;
   this.orderId = state.orderId || '';
+
 
 
   // ⛔️ HACK: force reload
