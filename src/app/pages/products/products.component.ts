@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-products',
@@ -26,25 +27,24 @@ export class ProductsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const resetCart = localStorage.getItem('resetCart') === 'true';
-      if (resetCart) {
-        localStorage.removeItem('productQuantities');
-        localStorage.removeItem('resetCart'); // clean it up
-      }
+    this.loadProducts();
+
+    // Re-load quantities when navigating back from product detail
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        if (event.url === '/products') {
+          this.initializeQuantities(); // ✅ Re-apply latest quantities
+        }
+      });
+  }
+
+  loadProducts() {
     this.productService.getProducts().subscribe((data: any[]) => {
       this.products = data;
       localStorage.setItem('productList', JSON.stringify(data));
       this.categories = [...new Set(this.products.map(p => p.category))];
-
-      this.cartService.getCartMapObservable().subscribe((cartMap: Map<string, number>) => {
-        this.products.forEach(product => {
-          const qty = cartMap.get(product.id.toString()) || 0;  // ensure string key
-          product.quantity = qty;
-        });
-      });
-
-      // Initialize quantities from local storage
-      this.initializeQuantities();
+      this.initializeQuantities(); // 👈 set initial quantities from localStorage
     });
   }
 
@@ -64,6 +64,10 @@ export class ProductsComponent implements OnInit {
   }
 
   buyProduct(product: any) {
+    this.router.navigate(['/product', product.id]);
+  }
+
+  goToDetail(product: any) {
     this.router.navigate(['/product', product.id]);
   }
 

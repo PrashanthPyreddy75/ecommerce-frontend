@@ -2,75 +2,71 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { ProductService } from '../../services/product.service'; // ✅ adjust path if needed
-import { map } from 'rxjs/operators';
+import { ProductService } from '../../services/product.service';
+import { CartService } from '../../services/cart.service';
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatSnackBarModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.css']
 })
 export class ProductDetailComponent implements OnInit {
   product: any;
-  quantity = 0;
+  limitReached = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private snackBar: MatSnackBar,
-    private productService: ProductService
+    private productService: ProductService,
+    private cartService: CartService
   ) {}
 
   ngOnInit(): void {
-    const productId = this.route.snapshot.paramMap.get('id')!;
-    const fromBack = window.history.state?.fromBack;
+    const state = window.history.state;
 
-this.productService.getProductById(productId).subscribe(product => {
-  this.product = product;
-
-      if (fromBack) {
-        const savedCart = JSON.parse(localStorage.getItem('cart') || '{}');
-        this.quantity = savedCart[this.product.id] || 0;
-      } else {
-        this.quantity = 0;
-      }
-    });
-  }
-
-  saveQuantity() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '{}');
-    cart[this.product.id] = this.quantity;
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }
-
-  increaseQuantity() {
-    if (this.quantity < this.product.stock) {
-      this.quantity++;
-      this.saveQuantity();
+    if (state && state.product) {
+      this.product = { ...state.product };
     } else {
-      this.snackBar.open("Sorry, you can't add more of this item.", '', { duration: 2000 });
+      const id = this.route.snapshot.paramMap.get('id');
+      const allProducts = JSON.parse(localStorage.getItem('productList') || '[]');
+      this.product = allProducts.find((p: any) => p.id === id);
+    }
+
+    if (this.product) {
+      const savedQty = this.cartService.getQuantity(this.product.id);
+      this.product.quantity = savedQty || 0;
     }
   }
 
-  decreaseQuantity() {
-    if (this.quantity > 0) {
-      this.quantity--;
-      this.saveQuantity();
+  updateQuantity(change: number) {
+    const current = this.product.quantity || 0;
+    const newQty = current + change;
+
+    if (change > 0 && newQty > this.product.stock) {
+      this.showLimitMessage();
+      return;
     }
+
+    const finalQty = newQty < 0 ? 0 : newQty;
+    this.product.quantity = finalQty;
+    this.cartService.updateQuantity(this.product.id, finalQty);
+    this.persistQuantity();
   }
 
-  orderNow() {
-    if (this.quantity > 0) {
-      this.router.navigate(['/order'], { state: { product: this.product, quantity: this.quantity } });
-    } else {
-      this.snackBar.open("Please select quantity before ordering.", '', { duration: 2000 });
-    }
+  persistQuantity() {
+    const saved = JSON.parse(localStorage.getItem('productQuantities') || '{}');
+    saved[this.product.id] = this.product.quantity;
+    localStorage.setItem('productQuantities', JSON.stringify(saved));
+  }
+
+  showLimitMessage() {
+    this.limitReached = true;
+    setTimeout(() => this.limitReached = false, 2000);
   }
 
   goBack() {
-    this.router.navigate(['/product', this.product.id]);
+    this.router.navigate(['/products']);
   }
 }
