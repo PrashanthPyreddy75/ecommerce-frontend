@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PaymentService } from '../../services/payment.service';
 import { OrderService } from '../../services/order.service';
+import { CartService } from '../../services/cart.service';
 
 @Component({
   selector: 'app-payment',
@@ -25,11 +26,11 @@ export class PaymentComponent implements OnInit, OnDestroy {
   cvvError = '';
 
   timer: any;
-  timeLeft = 70;
+  timeLeft = 30;
   showMessage = '';
   orderId: string = '';
 
-  constructor(private router: Router, private paymentService: PaymentService) {}
+  constructor(private router: Router, private paymentService: PaymentService, private cartService: CartService) {}
 
   ngOnInit(): void {
     const state = window.history.state as { retry?: boolean, orderId?: string };
@@ -119,41 +120,67 @@ this.cartItems = (Object.entries(cart) as [string, number][]).map(([id, quantity
     this.cvvError = this.cvv.length !== 3 ? 'CVV must be 3 digits.' : '';
   }
 
-  payNow() {
-    this.validateCardNumber();
-    this.validateExpiry();
-    this.validateCVV();
+payNow() {
+  this.validateCardNumber();
+  this.validateExpiry();
+  this.validateCVV();
 
-    if (!this.formValid) return;
+  if (!this.formValid) return;
+
+  this.paymentService.createPayment(this.orderId).subscribe({
+    next: (response) => {
+      try {
+        // Attempt to parse the response as JSON
+        const jsonResponse = JSON.parse(response);
+        this.showMessage = '✅ Payment Successful! Redirecting to Home page...';
+        this.cartService.clearCart();
+        localStorage.removeItem('cart');
+        localStorage.removeItem('productQuantities');
+        localStorage.setItem('resetCart', 'true');
+        setTimeout(() => {
+          this.router.navigate(['/products']);
+        }, 4000);
+      } catch (e) {
+        // Handle plain text response
+        this.showMessage = response;
+        this.cartService.clearCart();
+                localStorage.removeItem('cart');
+                localStorage.removeItem('productQuantities');
+                localStorage.setItem('resetCart', 'true');
+        setTimeout(() => {
+        this.router.navigate(['/products']);
+        }, 4000);
+      }
+    },
+    error: () => {
+      this.showMessage = 'Payment failed. Try again.';
+    }
+  });
+}
 
 
-    this.paymentService.createPayment(this.orderId).subscribe(
-      () => {
-              this.showMessage = '✅ Payment Successful! Redirecting to Home page...';
-              localStorage.removeItem('cart');
-              localStorage.removeItem('productQuantities');
-              localStorage.setItem('resetCart', 'true');
+cancelPayment() {
+  clearInterval(this.timer);
 
-              setTimeout(() => {
-                this.router.navigate(['/products']);
-              }, 2000);
-            },
-            () => {
-                  this.showMessage = '❌ Payment failed. Try again.';
-            }
-          );
+  const payload = {
+    products: this.cartItems.map(item => ({
+      productId: item.id,
+      quantity: item.quantity,
+      price: item.price
+    })),
+    paymentMethod: 'CREDIT_CARD'
+  };
 
-
-  }
-
-  cancelPayment() {
-    clearInterval(this.timer);
-
-    this.paymentService.cancelOrder(this.orderId).subscribe(() => {
+  this.paymentService.cancelOrder(this.orderId, payload).subscribe({
+    next: () => {
       this.router.navigate(['/order'], { state: { retry: true, orderId: this.orderId } });
-    });
+    },
+    error: () => {
+      this.router.navigate(['/order']);
+    }
+  });
+}
 
-  }
 
   ngOnDestroy(): void {
     clearInterval(this.timer);
