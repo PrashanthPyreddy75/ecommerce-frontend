@@ -27,6 +27,11 @@ export class ProductsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const reset = localStorage.getItem('resetCart');
+    if (reset === 'true') {
+      localStorage.removeItem('resetCart');
+      this.initializeQuantities();  // This should zero out quantities in UI
+    }
     this.loadProducts();
 
     // Re-load quantities when navigating back from product detail

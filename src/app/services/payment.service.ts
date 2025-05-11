@@ -10,14 +10,13 @@ export class PaymentService {
 
   constructor(private http: HttpClient) {}
 
+
 createPayment(orderId: string): Observable<any> {
-  return this.http.post(`${this.baseUrl}/payment-orders/create`, JSON.stringify(orderId), {
-    headers: { 'Content-Type': 'application/json' },
-    responseType: 'json'
-  });
+  return this.http.post(`${this.baseUrl}/payment-orders/create`, { orderId }, { responseType: 'text' });
 }
 
-  cancelOrder(orderId: string): Observable<any> {
-    return this.http.delete(`http://localhost:8082/api/order/${orderId}`, { responseType: 'text' });
-  }
+
+cancelOrder(orderId: string, payload: any): Observable<any> {
+  return this.http.put(`http://localhost:8082/api/order/${orderId}`, payload);
+}
 }

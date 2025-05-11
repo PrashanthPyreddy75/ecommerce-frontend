@@ -1,6 +1,6 @@
 <nav class="navbar">
   <div class="logo" (click)="goHome()" style="cursor: pointer;">
-    🛒 Demokart
+    <img src="https://maxtranssystems.com/images/logo.png" alt="Demokart" class="logo-img" />
   </div>
 
   <div *ngIf="showNav" class="nav-actions">
@@ -22,5 +22,5 @@
     <button class="logout-btn" (click)="logout()">Logout</button>
   </div>
 </nav>
-
+<div class="background-overlay"></div>
 <router-outlet></router-outlet>

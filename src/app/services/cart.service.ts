@@ -86,4 +86,5 @@ resetCart() {
   this.cartMap$.next(new Map());
   this.cartState$.next({});
 }
+
 }
