@@ -1,0 +1,130 @@
+.landing-container {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9fafb;
+  padding: 20px;
+}
+
+.landing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.actions .cart, .actions .logout {
+  display: inline-block;
+  margin-left: 20px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.landing-main {
+  text-align: center;
+  padding: 40px 0;
+}
+
+.explore-btn {
+  margin: 20px 0;
+  padding: 12px 24px;
+  font-size: 16px;
+  background-color: #1e88e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.usps {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 30px 0;
+}
+
+.usp {
+  max-width: 200px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.testimonials {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.testimonials blockquote {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  font-style: italic;
+  width: 300px;
+}
+
+.offer-banner {
+  background: #fff3cd;
+  padding: 25px;
+  border: 1px solid #ffeeba;
+  color: #856404;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+}
+.hero-section {
+  background: url('https://wallpaperaccess.com/full/3898880.jpg') no-repeat center center;
+  background-size: cover;
+  padding: 60px 20px;
+  text-align: center;
+  color: #2D335A;
+  width: 100vw;
+  margin-left: calc(-1 * (100vw - 100%) / 2); /* to cancel out container centering */
+  box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.3); /* dark overlay for readability */
+}
+
+.hero-section h1 {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.hero-section p {
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.hero-section button {
+  padding: 12px 24px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 30px;
+}
+
+.usp-boxes {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+.usp {
+  background: white;
+  width: 160px;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  font-size: 14px;
+}
+

@@ -16,6 +16,7 @@ export class AppComponent {
   showSearch = false;
   currentUrl = '';
   cartCount: number = 0;
+  isHomePage = false;
 
   constructor(private router: Router, private cartService: CartService) {
     this.cartService.cartCountObservable().subscribe(count => {
@@ -28,6 +29,7 @@ export class AppComponent {
         this.currentUrl = event.urlAfterRedirects;
         this.showNav = !this.currentUrl.includes('/login');
         this.showSearch = this.currentUrl === '/products';
+        this.isHomePage = this.currentUrl === '/home';
       });
   }
 
@@ -43,6 +45,6 @@ goToOrder() {
   }
 
   goHome() {
-    this.router.navigate(['/products']);
+    this.router.navigate(['/home']);
   }
 }
