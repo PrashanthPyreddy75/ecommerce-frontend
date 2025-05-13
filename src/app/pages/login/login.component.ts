@@ -19,7 +19,7 @@ export class LoginComponent {
   login() {
     if (this.email && this.password) {
       localStorage.setItem('user', this.email);
-      this.router.navigate(['/products']);
+      this.router.navigate(['/home']);
     } else {
       alert('Please enter Email and Password');
     }

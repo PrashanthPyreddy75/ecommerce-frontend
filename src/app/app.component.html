@@ -3,8 +3,10 @@
     <img src="https://maxtranssystems.com/images/logo.png" alt="Demokart" class="logo-img" />
   </div>
 
+
   <div *ngIf="showNav" class="nav-actions">
     <div
+      *ngIf="!isHomePage"
       class="cart-nav"
       [class.disabled]="cartCount === 0"
       [class.active]="cartCount > 0"
