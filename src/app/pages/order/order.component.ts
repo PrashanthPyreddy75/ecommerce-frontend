@@ -78,6 +78,7 @@ ngOnInit(): void {
 
   proceedToPayment() {
   const payload = {
+    userId: "11111111-1111-1111-1111-111111111111",
     products: this.cartItems.map(item => ({
       productId: item.id,
       quantity: item.quantity,
